@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="OhmScan: laboratorio web para leer y diseñar resistencias por código de colores.">
+<title>OhmScan | GitHub Pages</title>
+<style>
+:root{
+  --bg:#f4efe7;
+  --paper:#fffaf3;
+  --panel:#fffdf9;
+  --line:#e7d9c4;
+  --ink:#1b2431;
+  --soft:#627084;
+  --accent:#b86d29;
+  --accent-soft:#fff1e5;
+  --ok:#2f7657;
+  --warn:#a54d2d;
+  --blue:#355c8b;
+  --shadow:0 22px 48px rgba(71,51,24,.10);
+  --radius-xl:28px;
+  --radius-lg:22px;
+  --radius-md:16px;
+  --font-sans:Bahnschrift, Aptos, "Segoe UI Variable Text", "Trebuchet MS", sans-serif;
+  --font-display:"Book Antiqua", "Palatino Linotype", Georgia, serif;
+  --font-mono:"Cascadia Mono", Consolas, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:var(--font-sans);
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(221,169,88,.24), transparent 26rem),
+    radial-gradient(circle at top right, rgba(68,123,104,.17), transparent 22rem),
+    linear-gradient(180deg, #fff9f0 0%, #f5efe5 56%, #ece4d7 100%);
+}
+.shell{width:min(1240px,calc(100vw - 28px));margin:18px auto 34px}
+.panel{
+  background:linear-gradient(180deg, rgba(255,253,249,.96), rgba(255,250,242,.92));
+  border:1px solid var(--line);
+  border-radius:var(--radius-xl);
+  box-shadow:var(--shadow);
+}
+.hero{padding:28px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,.9fr);gap:18px}
+.eyebrow,.label{
+  margin:0;
+  text-transform:uppercase;
+  letter-spacing:.24em;
+  font-size:.74rem;
+  color:var(--soft);
+}
+h1{
+  margin:8px 0 10px;
+  font-family:var(--font-display);
+  font-size:clamp(2.8rem,5vw,4.5rem);
+  line-height:.95;
+}
+.lede{margin:0;max-width:62ch;color:#49576a;line-height:1.72;font-size:1.04rem}
+.badges,.controls-row,.segmented,.swatch-grid,.chip-row,.designer-options{display:flex;flex-wrap:wrap;gap:10px}
+.badges{margin-top:18px}
+.badge,.chip,.status,.pill,.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:38px;
+  padding:0 14px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.82);
+  color:var(--ink);
+  font-weight:700;
+}
+.badge{background:var(--accent-soft);color:#8a4e18;border-color:#f0d0ad}
+.hero-cards{display:grid;gap:12px}
+.hero-card{
+  padding:18px;
+  border-radius:var(--radius-lg);
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.72);
+}
+.hero-card strong{display:block;font-size:1rem}
+.hero-card span{display:block;margin-top:6px;line-height:1.6;color:#566679}
+.toolbar{margin-top:18px;padding:18px 22px;display:flex;justify-content:space-between;align-items:end;gap:16px}
+.toolbar-group{display:grid;gap:10px}
+.toolbar-actions{margin-left:auto}
+.btn{
+  cursor:pointer;
+  transition:transform .16s ease, border-color .16s ease, background-color .16s ease, color .16s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn--segment{background:rgba(255,255,255,.78);color:#536275}
+.btn--segment.is-active{background:rgba(184,109,41,.12);border-color:#e7b789;color:#8a4e18}
+.btn--ghost{color:#536275}
+.btn--ghost:hover{color:var(--blue);border-color:#bfd0e8}
+.btn--primary{
+  justify-content:center;
+  background:linear-gradient(135deg,#b86d29,#955113);
+  color:#fff7ef;
+  border-color:#955113;
+}
+.workspace{margin-top:18px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.85fr);gap:18px}
+.stage,.summary,.info{padding:22px}
+.head{display:flex;justify-content:space-between;gap:16px;align-items:start}
+.head h2,.info h2{margin:8px 0 0;font-size:1.42rem}
+.head-note{margin:0;max-width:34ch;color:var(--soft);line-height:1.6}
+.stage-visual{
+  margin-top:18px;
+  padding:18px;
+  border-radius:20px;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.84), rgba(246,238,226,.92)),
+    radial-gradient(circle at top right, rgba(47,118,87,.08), transparent 54%);
+}
+#resistor-svg svg{display:block;width:100%;height:auto}
+.pill{padding:8px 12px;min-height:auto;font-weight:600;font-size:.9rem}
+.editor{margin-top:18px}
+.band-card{
+  padding:18px;
+  border-radius:20px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.72);
+}
+.band-card + .band-card{margin-top:12px}
+.band-card-head{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:14px}
+.band-card-head h3{margin:0;font-size:1rem}
+.hint,.muted{color:var(--soft)}
+.hint{display:block;margin-top:4px;font-size:.92rem}
+.current{text-align:right;font-size:.92rem}
+.current strong{display:block;margin-top:4px;color:var(--ink)}
+.swatch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr))}
+.swatch{
+  min-height:66px;
+  padding:10px 8px;
+  text-align:left;
+  border-radius:16px;
+  border:1px solid rgba(0,0,0,.08);
+  cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
+}
+.swatch.is-selected{outline:3px solid rgba(53,92,139,.18);outline-offset:0}
+.swatch-code{display:block;font-size:.7rem;letter-spacing:.14em;opacity:.76;text-transform:uppercase}
+.swatch-label{display:block;margin-top:5px;font-weight:700}
+.designer{display:grid;grid-template-columns:minmax(240px,.95fr) minmax(0,1.05fr);gap:16px}
+.field{display:grid;gap:10px}
+.field input,.field select{
+  min-height:52px;
+  border-radius:18px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.82);
+  color:var(--ink);
+  padding:0 16px;
+}
+.field input{font-family:var(--font-mono);font-size:1.15rem}
+.value-row{display:flex;gap:10px}
+.value-row input{flex:1}
+.designer-help{
+  margin-top:16px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(53,92,139,.08);
+  color:var(--blue);
+  line-height:1.68;
+}
+.summary-value{
+  margin:18px 0 14px;
+  font-family:var(--font-display);
+  font-size:clamp(2rem,4vw,3.2rem);
+  line-height:1;
+}
+.summary-caption{margin:0;color:#526274;line-height:1.7}
+.status{flex-shrink:0}
+.status.pending{background:rgba(53,92,139,.10);border-color:#cad8ea;color:var(--blue)}
+.status.ready{background:rgba(47,118,87,.12);border-color:#c6e1d7;color:var(--ok)}
+.status.warn{background:rgba(184,109,41,.12);border-color:#efcfaa;color:#8a4e18}
+.metric-grid{margin-top:16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.metric{
+  padding:16px;
+  border-radius:18px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.76);
+}
+.metric span{display:block;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft)}
+.metric strong{display:block;margin-top:10px;font-size:1.06rem;line-height:1.34}
+.metric p{margin:8px 0 0;color:#566679;line-height:1.55}
+.notice{
+  margin-top:14px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(244,225,219,.78);
+  color:var(--warn);
+  line-height:1.65;
+}
+.lower{margin-top:18px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.82fr) minmax(0,.82fr);gap:18px}
+.disclosure{padding:0;overflow:hidden}
+.disclosure summary{
+  list-style:none;
+  cursor:pointer;
+  padding:20px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:700;
+}
+.disclosure summary::-webkit-details-marker{display:none}
+.disclosure summary::after{content:"▾";color:var(--accent)}
+.disclosure-body{padding:0 22px 22px}
+.table-wrap{overflow:auto;border-radius:18px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:520px;background:rgba(255,255,255,.78)}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid #eee2d0}
+th{background:rgba(255,248,238,.95);color:var(--soft);text-transform:uppercase;letter-spacing:.14em;font-size:.76rem}
+.color-cell{display:flex;align-items:center;gap:10px}
+.dot{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.16);flex-shrink:0}
+.list{margin:16px 0 0;padding-left:18px;color:#526274}
+.list li + li{margin-top:10px}
+.footer{margin-top:18px;text-align:center;color:var(--soft);font-size:.94rem}
+.toast{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  max-width:320px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(26,32,43,.94);
+  color:#fffaf2;
+  box-shadow:var(--shadow);
+}
+.hidden{display:none!important}
+@media (max-width:1060px){
+  .hero,.workspace,.lower{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .shell{width:min(100vw - 18px,100%);margin:10px auto 26px}
+  .hero,.stage,.summary,.info,.toolbar,.disclosure-body,.disclosure summary{padding-left:18px;padding-right:18px}
+  .toolbar{align-items:stretch}
+  .toolbar-actions{margin-left:0}
+  .designer,.metric-grid{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+  .value-row{flex-direction:column}
+  .btn--segment,.btn--ghost,.btn--primary{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="panel hero">
+    <div>
+      <p class="eyebrow">Precision Lab · GitHub Pages · IEC 60062</p>
+      <h1>OhmScan</h1>
+      <p class="lede">Una web para leer resistencias por colores, calcular rango y serie comercial, y generar una combinación desde un valor objetivo. Todo corre en el navegador, sin dependencias y sin telemetría.</p>
+      <div class="badges">
+        <span class="badge">100% local</span>
+        <span class="badge">Sin dependencias</span>
+        <span class="badge">3 a 6 bandas</span>
+        <span class="badge">Diseño asistido</span>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <article class="hero-card"><strong>Leer el código</strong><span>Decodifica resistencias de 3, 4, 5 y 6 bandas con rango útil y serie estándar.</span></article>
+      <article class="hero-card"><strong>Diseñar desde un valor</strong><span>Introduce un valor objetivo y obtén la combinación exacta o la más cercana.</span></article>
+      <article class="hero-card"><strong>Listo para compartir</strong><span>Publicación estática ideal para GitHub Pages, rápida y fácil de abrir desde cualquier dispositivo.</span></article>
+    </div>
+  </section>
+
+  <section class="panel toolbar">
+    <div class="toolbar-group">
+      <p class="label">Modo</p>
+      <div class="segmented" id="mode-switch"></div>
+    </div>
+    <div class="toolbar-group">
+      <p class="label">Bandas</p>
+      <div class="segmented" id="band-switch"></div>
+    </div>
+    <div class="toolbar-group toolbar-actions">
+      <p class="label">Acciones</p>
+      <div class="controls-row">
+        <button class="btn btn--ghost" id="copy-btn" type="button">Copiar resumen</button>
+        <button class="btn btn--ghost" id="reset-btn" type="button">Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="workspace">
+    <section class="panel stage">
+      <div class="head">
+        <div>
+          <p class="label">Superficie activa</p>
+          <h2 id="stage-title">Visualizador de bandas</h2>
+        </div>
+        <p class="head-note" id="stage-note">Selecciona colores para leer el valor real de la resistencia.</p>
+      </div>
+
+      <div class="stage-visual">
+        <div id="resistor-svg"></div>
+        <div class="chip-row" id="band-pills"></div>
+      </div>
+
+      <section class="editor" id="decode-editor"></section>
+
+      <section class="editor hidden" id="design-editor">
+        <div class="designer">
+          <div class="field">
+            <label class="label" for="target-value">Valor objetivo</label>
+            <div class="value-row">
+              <input id="target-value" type="number" min="0.01" step="0.01" value="4.7" inputmode="decimal">
+              <select id="target-unit">
+                <option value="1">Ω</option>
+                <option value="1000" selected>kΩ</option>
+                <option value="1000000">MΩ</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <span class="label">Configuración</span>
+            <div class="designer-options" id="design-options"></div>
+            <div class="designer-options" id="tempco-options"></div>
+          </div>
+        </div>
+        <div class="designer-help" id="designer-help">Introduce un valor positivo para obtener una sugerencia lista para aplicar.</div>
+      </section>
+    </section>
+
+    <aside class="panel summary">
+      <div class="head">
+        <div>
+          <p class="label">Resumen</p>
+          <h2 id="summary-title">Lectura en curso</h2>
+        </div>
+        <span class="status pending" id="status-chip">Esperando bandas</span>
+      </div>
+      <div class="summary-value" id="summary-value">Selecciona todas las bandas</div>
+      <p class="summary-caption" id="summary-caption">El resultado aparecerá aquí con rango, fórmula y serie comercial.</p>
+      <div class="chip-row" id="summary-chips"></div>
+      <div class="metric-grid">
+        <article class="metric">
+          <span>Rango útil</span>
+          <strong id="metric-range">—</strong>
+          <p id="metric-range-note">Necesita una tolerancia definida.</p>
+        </article>
+        <article class="metric">
+          <span>Serie comercial</span>
+          <strong id="metric-series">—</strong>
+          <p id="metric-series-note">Se estima desde el valor nominal.</p>
+        </article>
+        <article class="metric">
+          <span>Código</span>
+          <strong id="metric-bands">—</strong>
+          <p id="metric-bands-note">Las bandas activas se muestran aquí.</p>
+        </article>
+        <article class="metric">
+          <span>Fórmula</span>
+          <strong id="metric-formula">—</strong>
+          <p id="metric-formula-note">Lectura IEC 60062.</p>
+        </article>
+      </div>
+      <div class="notice" id="summary-note">La aplicación corre íntegramente en el navegador y no realiza peticiones de red.</div>
+      <button class="btn btn--primary hidden" id="apply-btn" type="button">Aplicar sugerencia al lector</button>
+    </aside>
+  </main>
+
+  <section class="lower">
+    <details class="panel disclosure" open>
+      <summary>Referencia IEC 60062 y series comerciales</summary>
+      <div class="disclosure-body" id="reference-area"></div>
+    </details>
+    <section class="panel info">
+      <p class="label">Buenas prácticas</p>
+      <h2>Cómo leer mejor una resistencia</h2>
+      <ul class="list">
+        <li>Empieza por el lado donde las bandas estén más juntas. La tolerancia suele quedar más separada.</li>
+        <li>En 4 bandas se leen 2 dígitos, luego el multiplicador y por último la tolerancia.</li>
+        <li>En 5 y 6 bandas se leen 3 dígitos; la sexta añade coeficiente térmico.</li>
+        <li>Si un valor no existe exactamente en la serie estándar, conviene elegir el más cercano y revisar el margen.</li>
+      </ul>
+    </section>
+    <section class="panel info">
+      <p class="label">Publicación</p>
+      <h2>Versión para GitHub Pages</h2>
+      <ul class="list">
+        <li>Archivo único, sin dependencias externas y fácil de mantener.</li>
+        <li>Ideal para compartir un enlace público sin instalar nada.</li>
+        <li>Compatible con móvil y escritorio.</li>
+        <li>Diseñada para servir directamente desde la rama principal del repositorio.</li>
+      </ul>
+    </section>
+  </section>
+
+  <p class="footer">OhmScan · web estática preparada para GitHub Pages</p>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = (selector) => document.querySelector(selector);
+  const app = {
+    modeSwitch: $("#mode-switch"),
+    bandSwitch: $("#band-switch"),
+    stageTitle: $("#stage-title"),
+    stageNote: $("#stage-note"),
+    resistorSvg: $("#resistor-svg"),
+    bandPills: $("#band-pills"),
+    decodeEditor: $("#decode-editor"),
+    designEditor: $("#design-editor"),
+    designOptions: $("#design-options"),
+    tempcoOptions: $("#tempco-options"),
+    targetValue: $("#target-value"),
+    targetUnit: $("#target-unit"),
+    designerHelp: $("#designer-help"),
+    summaryTitle: $("#summary-title"),
+    statusChip: $("#status-chip"),
+    summaryValue: $("#summary-value"),
+    summaryCaption: $("#summary-caption"),
+    summaryChips: $("#summary-chips"),
+    metricRange: $("#metric-range"),
+    metricRangeNote: $("#metric-range-note"),
+    metricSeries: $("#metric-series"),
+    metricSeriesNote: $("#metric-series-note"),
+    metricBands: $("#metric-bands"),
+    metricBandsNote: $("#metric-bands-note"),
+    metricFormula: $("#metric-formula"),
+    metricFormulaNote: $("#metric-formula-note"),
+    summaryNote: $("#summary-note"),
+    applyBtn: $("#apply-btn"),
+    referenceArea: $("#reference-area"),
+    copyBtn: $("#copy-btn"),
+    resetBtn: $("#reset-btn"),
+    toast: $("#toast")
+  };
+
+  const COLORS = {
+    negro:{label:"Negro",short:"NGR",digit:0,mult:1,tol:null,temp:250,fill:"#20252c",stroke:"#505862",ink:"#f8fafc"},
+    marron:{label:"Marrón",short:"MRN",digit:1,mult:10,tol:1,temp:100,fill:"#734835",stroke:"#986450",ink:"#fff4eb"},
+    rojo:{label:"Rojo",short:"ROJ",digit:2,mult:100,tol:2,temp:50,fill:"#c6463d",stroke:"#dc6b63",ink:"#fff5f2"},
+    naranja:{label:"Naranja",short:"NAR",digit:3,mult:1000,tol:0.05,temp:15,fill:"#d87830",stroke:"#e79658",ink:"#fff8f1"},
+    amarillo:{label:"Amarillo",short:"AMA",digit:4,mult:10000,tol:0.02,temp:25,fill:"#d8b83f",stroke:"#e7cd73",ink:"#2b230e"},
+    verde:{label:"Verde",short:"VRD",digit:5,mult:100000,tol:0.5,temp:20,fill:"#438d62",stroke:"#68aa82",ink:"#f7fff9"},
+    azul:{label:"Azul",short:"AZL",digit:6,mult:1000000,tol:0.25,temp:10,fill:"#3d629d",stroke:"#6789c0",ink:"#f6f9ff"},
+    violeta:{label:"Violeta",short:"VIO",digit:7,mult:10000000,tol:0.1,temp:5,fill:"#6f4cae",stroke:"#9172c9",ink:"#fbf7ff"},
+    gris:{label:"Gris",short:"GRS",digit:8,mult:100000000,tol:0.01,temp:1,fill:"#98a1ab",stroke:"#b4bcc4",ink:"#1d2430"},
+    blanco:{label:"Blanco",short:"BLC",digit:9,mult:1000000000,tol:null,temp:null,fill:"#f0eee8",stroke:"#d7d4cf",ink:"#20242a"},
+    dorado:{label:"Dorado",short:"DOR",digit:null,mult:0.1,tol:5,temp:null,fill:"#c5a343",stroke:"#debd68",ink:"#251905"},
+    plateado:{label:"Plateado",short:"PLT",digit:null,mult:0.01,tol:10,temp:null,fill:"#bdc5cf",stroke:"#d9dde5",ink:"#1d2731"}
+  };
+
+  const ORDER = ["negro","marron","rojo","naranja","amarillo","verde","azul","violeta","gris","blanco","dorado","plateado"];
+  const DIGITS = ORDER.filter((key) => COLORS[key].digit !== null);
+  const FIRST_DIGITS = DIGITS.filter((key) => COLORS[key].digit > 0);
+  const MULTS = ORDER.slice();
+  const TOLS = ORDER.filter((key) => COLORS[key].tol !== null);
+  const TEMPS = ORDER.filter((key) => COLORS[key].temp !== null && key !== "blanco");
+  const TOL_OPTIONS = [10,5,2,1,0.5,0.25,0.1,0.05,0.02,0.01];
+  const TEMP_OPTIONS = [100,50,25,20,15,10,5,1];
+  const SCHEMES = {
+    3:[{label:"1ª banda",hint:"Primer dígito",type:"digit"},{label:"2ª banda",hint:"Segundo dígito",type:"digit"},{label:"Multiplicador",hint:"Factor de escala",type:"mult"}],
+    4:[{label:"1ª banda",hint:"Primer dígito",type:"digit"},{label:"2ª banda",hint:"Segundo dígito",type:"digit"},{label:"Multiplicador",hint:"Factor de escala",type:"mult"},{label:"Tolerancia",hint:"Margen de error",type:"tol"}],
+    5:[{label:"1ª banda",hint:"Primer dígito",type:"digit"},{label:"2ª banda",hint:"Segundo dígito",type:"digit"},{label:"3ª banda",hint:"Tercer dígito",type:"digit"},{label:"Multiplicador",hint:"Factor de escala",type:"mult"},{label:"Tolerancia",hint:"Margen de error",type:"tol"}],
+    6:[{label:"1ª banda",hint:"Primer dígito",type:"digit"},{label:"2ª banda",hint:"Segundo dígito",type:"digit"},{label:"3ª banda",hint:"Tercer dígito",type:"digit"},{label:"Multiplicador",hint:"Factor de escala",type:"mult"},{label:"Tolerancia",hint:"Margen de error",type:"tol"},{label:"Tempco",hint:"ppm por °C",type:"temp"}]
+  };
+
+  const state = {
+    mode:"decode",
+    bandCount:4,
+    selections:[null,null,null,null],
+    targetValue:"4.7",
+    targetUnit:"1000",
+    targetTolerance:"5",
+    targetTemp:"100",
+    suggestion:null,
+    toastTimer:0
+  };
+
+  init();
+
+  function init(){
+    bind();
+    buildReference();
+    render();
+  }
+
+  function bind(){
+    app.copyBtn.addEventListener("click", copySummary);
+    app.resetBtn.addEventListener("click", resetCurrent);
+    app.applyBtn.addEventListener("click", applySuggestion);
+    app.targetValue.addEventListener("input", (event) => { state.targetValue = event.target.value; render(); });
+    app.targetUnit.addEventListener("change", (event) => { state.targetUnit = event.target.value; render(); });
+  }
+
+  function render(){
+    syncState();
+    renderModeSwitch();
+    renderBandSwitch();
+    renderStage();
+    renderEditors();
+    renderSummary();
+  }
+
+  function syncState(){
+    if (state.selections.length !== state.bandCount) state.selections = new Array(state.bandCount).fill(null);
+    if (state.bandCount < 4) state.targetTolerance = "20";
+    if (state.bandCount === 6 && !TEMP_OPTIONS.includes(Number(state.targetTemp))) state.targetTemp = "100";
+    if (state.bandCount > 3){
+      const allowed = TOL_OPTIONS;
+      if (!allowed.includes(Number(state.targetTolerance))) state.targetTolerance = state.bandCount === 4 ? "5" : "1";
+    }
+  }
+
+  function renderModeSwitch(){
+    const items = [
+      {id:"decode",label:"Leer bandas"},
+      {id:"design",label:"Diseñar valor"}
+    ];
+    app.modeSwitch.innerHTML = items.map((item) => `<button class="btn btn--segment${state.mode===item.id?" is-active":""}" type="button" data-mode="${item.id}">${item.label}</button>`).join("");
+    app.modeSwitch.querySelectorAll("[data-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.mode = button.dataset.mode;
+        render();
+      });
+    });
+  }
+
+  function renderBandSwitch(){
+    app.bandSwitch.innerHTML = [3,4,5,6].map((count) => `<button class="btn btn--segment${state.bandCount===count?" is-active":""}" type="button" data-count="${count}">${count} bandas</button>`).join("");
+    app.bandSwitch.querySelectorAll("[data-count]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.bandCount = Number(button.dataset.count);
+        state.selections = new Array(state.bandCount).fill(null);
+        render();
+      });
+    });
+  }
+
+  function renderStage(){
+    const result = activeResult();
+    const bands = result ? result.bands : new Array(state.bandCount).fill(null);
+    app.stageTitle.textContent = state.mode === "decode" ? "Visualizador de bandas" : "Diseñador de resistencias";
+    app.stageNote.textContent = state.mode === "decode"
+      ? "Selecciona colores para leer el valor real de la resistencia."
+      : "Introduce un valor objetivo y te propongo una combinación lista para usar.";
+    renderResistor(bands);
+    renderBandPills(bands);
+  }
+
+  function renderEditors(){
+    if (state.mode === "decode"){
+      app.decodeEditor.classList.remove("hidden");
+      app.designEditor.classList.add("hidden");
+      renderDecodeEditor();
+    } else {
+      app.decodeEditor.classList.add("hidden");
+      app.designEditor.classList.remove("hidden");
+      renderDesignEditor();
+    }
+  }
+
+  function renderDecodeEditor(){
+    const roles = SCHEMES[state.bandCount];
+    app.decodeEditor.innerHTML = roles.map((role, index) => {
+      const current = state.selections[index] ? COLORS[state.selections[index]].label : "Sin elegir";
+      const options = colorOptions(role.type, index).map((key) => {
+        const color = COLORS[key];
+        const selected = state.selections[index] === key ? " is-selected" : "";
+        return `<button class="swatch${selected}" data-band="${index}" data-color="${key}" type="button" style="background:linear-gradient(180deg,${color.fill},${shade(color.fill)});color:${color.ink};border-color:${color.stroke}">
+          <span class="swatch-code">${color.short}</span>
+          <span class="swatch-label">${color.label}</span>
+        </button>`;
+      }).join("");
+      return `<article class="band-card">
+        <div class="band-card-head">
+          <div><h3>${role.label}</h3><span class="hint">${role.hint}</span></div>
+          <div class="current">Activo<strong>${current}</strong></div>
+        </div>
+        <div class="swatch-grid">${options}</div>
+      </article>`;
+    }).join("");
+
+    app.decodeEditor.querySelectorAll("[data-band]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const index = Number(button.dataset.band);
+        const color = button.dataset.color;
+        state.selections[index] = state.selections[index] === color ? null : color;
+        render();
+      });
+    });
+  }
+
+  function renderDesignEditor(){
+    app.targetValue.value = state.targetValue;
+    app.targetUnit.value = state.targetUnit;
+
+    if (state.bandCount > 3){
+      app.designOptions.innerHTML = TOL_OPTIONS.map((value) => {
+        const active = Number(state.targetTolerance) === value ? " is-active" : "";
+        return `<button class="btn btn--segment${active}" data-tol="${value}" type="button">±${formatPercent(value)}%</button>`;
+      }).join("");
+      app.designOptions.querySelectorAll("[data-tol]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.targetTolerance = button.dataset.tol;
+          render();
+        });
+      });
+    } else {
+      app.designOptions.innerHTML = `<span class="chip">3 bandas · tolerancia implícita ±20%</span>`;
+    }
+
+    if (state.bandCount === 6){
+      app.tempcoOptions.innerHTML = TEMP_OPTIONS.map((value) => {
+        const active = Number(state.targetTemp) === value ? " is-active" : "";
+        return `<button class="btn btn--segment${active}" data-temp="${value}" type="button">${value} ppm</button>`;
+      }).join("");
+      app.tempcoOptions.querySelectorAll("[data-temp]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.targetTemp = button.dataset.temp;
+          render();
+        });
+      });
+    } else {
+      app.tempcoOptions.innerHTML = "";
+    }
+
+    state.suggestion = computeSuggestion();
+    app.designerHelp.textContent = !state.suggestion
+      ? "Introduce un valor positivo para obtener una sugerencia válida."
+      : state.suggestion.exact
+        ? `Existe una combinación exacta para ${formatOhms(state.suggestion.target)} con ${state.bandCount} bandas.`
+        : `La mejor combinación para ${formatOhms(state.suggestion.target)} deja un error de ${formatPercent(state.suggestion.deltaPct)}%.`;
+  }
+
+  function renderSummary(){
+    const payload = state.mode === "decode" ? decodePayload() : designPayload();
+    app.summaryTitle.textContent = payload.title;
+    app.statusChip.textContent = payload.status;
+    app.statusChip.className = `status ${payload.statusClass}`;
+    app.summaryValue.textContent = payload.value;
+    app.summaryCaption.textContent = payload.caption;
+    app.summaryChips.innerHTML = payload.chips.map((chip) => `<span class="chip">${chip}</span>`).join("");
+    app.metricRange.textContent = payload.range;
+    app.metricRangeNote.textContent = payload.rangeNote;
+    app.metricSeries.textContent = payload.series;
+    app.metricSeriesNote.textContent = payload.seriesNote;
+    app.metricBands.textContent = payload.bands;
+    app.metricBandsNote.textContent = payload.bandsNote;
+    app.metricFormula.textContent = payload.formula;
+    app.metricFormulaNote.textContent = payload.formulaNote;
+    app.summaryNote.textContent = payload.note;
+    app.applyBtn.classList.toggle("hidden", !(state.mode === "design" && state.suggestion));
+    app.applyBtn.textContent = state.suggestion && !state.suggestion.exact ? "Aplicar sugerencia al lector" : "Aplicar diseño exacto al lector";
+    app.summaryText = payload.copy;
+  }
+
+  function decodePayload(){
+    const result = computeDecode(state.selections);
+    if (!result){
+      return {
+        title:"Lectura en curso",
+        status:"Esperando bandas",
+        statusClass:"pending",
+        value:"Selecciona todas las bandas",
+        caption:`Completa las ${state.bandCount} bandas para obtener el valor nominal.`,
+        chips:[`${state.bandCount} bandas`,"Modo lectura"],
+        range:"—",
+        rangeNote:"Necesita una tolerancia definida.",
+        series:"—",
+        seriesNote:"Se estima desde el valor nominal.",
+        bands:describeBands(state.selections, false),
+        bandsNote:`${state.bandCount} bandas: ${schemeText(state.bandCount)}.`,
+        formula:"—",
+        formulaNote:"Completa el código para ver el cálculo.",
+        note:"La aplicación corre íntegramente en el navegador y no realiza peticiones de red.",
+        copy:`OhmScan | ${state.bandCount} bandas | pendiente`
+      };
+    }
+    return resultPayload(result, "Lectura completa", "Valor listo", "ready");
+  }
+
+  function designPayload(){
+    state.suggestion = computeSuggestion();
+    if (!state.suggestion){
+      return {
+        title:"Diseño asistido",
+        status:"Esperando valor",
+        statusClass:"pending",
+        value:"Introduce un objetivo",
+        caption:`Define un valor para generar una propuesta de ${state.bandCount} bandas.`,
+        chips:[`${state.bandCount} bandas`,"Modo diseño"],
+        range:"—",
+        rangeNote:"Todavía no hay un diseño válido.",
+        series:"—",
+        seriesNote:"Aparecerá con la propuesta calculada.",
+        bands:"—",
+        bandsNote:`Configuración esperada: ${schemeText(state.bandCount)}.`,
+        formula:"—",
+        formulaNote:"Se mostrará la lectura equivalente.",
+        note:"El diseñador busca una combinación exacta o la más cercana para este número de bandas.",
+        copy:`OhmScan | diseño pendiente | ${state.bandCount} bandas`
+      };
+    }
+    const tone = state.suggestion.exact ? "ready" : "warn";
+    const label = state.suggestion.exact ? "Diseño exacto" : "Diseño sugerido";
+    const payload = resultPayload(state.suggestion.result, label, state.suggestion.exact ? "Exacto" : "Ajuste cercano", tone);
+    payload.caption += ` · Objetivo ${formatOhms(state.suggestion.target)}`;
+    if (!state.suggestion.exact) payload.chips.unshift(`Error ${formatPercent(state.suggestion.deltaPct)}%`);
+    payload.note = state.suggestion.exact
+      ? "La combinación calculada coincide con el valor objetivo."
+      : `No existe combinación exacta para ${formatOhms(state.suggestion.target)} con esta configuración; se propone la mejor aproximación.`;
+    payload.copy = `OhmScan | ${label} | objetivo ${formatOhms(state.suggestion.target)} | resultado ${formatOhms(state.suggestion.result.value)} | código ${describeBands(state.suggestion.result.bands, true)}`;
+    return payload;
+  }
+
+  function resultPayload(result, title, status, statusClass){
+    return {
+      title,
+      status,
+      statusClass,
+      value:formatOhms(result.value),
+      caption:`Nominal ${formatExact(result.value)}`,
+      chips:buildChips(result),
+      range:result.range ? `${formatOhms(result.range.min)} → ${formatOhms(result.range.max)}` : "Sin tolerancia",
+      rangeNote:result.range ? `±${formatPercent(result.tolerance)}% alrededor del valor nominal.` : "En 3 bandas se asume ±20%.",
+      series:result.series.name,
+      seriesNote:`Valor preferente cercano: ${formatOhms(result.series.closest)}.`,
+      bands:describeBands(result.bands, true),
+      bandsNote:`${result.bands.length} bandas: ${schemeText(result.bands.length)}.`,
+      formula:`${result.digits} × ${formatMultiplier(result.multiplier)}`,
+      formulaNote:`Resultado nominal: ${formatOhms(result.value)}.`,
+      note:"La aplicación corre íntegramente en el navegador y no realiza peticiones de red.",
+      copy:`OhmScan | ${title} | ${formatOhms(result.value)} | ${describeBands(result.bands, true)}`
+    };
+  }
+
+  function buildChips(result){
+    const chips = [result.tolerance !== null ? `Tolerancia ±${formatPercent(result.tolerance)}%` : "Tolerancia ±20%", `Nominal ${formatExact(result.value)}`, result.series.name];
+    if (result.tempco !== null) chips.push(`Tempco ${result.tempco} ppm/°C`);
+    return chips;
+  }
+
+  function activeResult(){
+    return state.mode === "decode" ? computeDecode(state.selections) : (computeSuggestion() || {}).result || null;
+  }
+
+  function computeDecode(bands){
+    const scheme = SCHEMES[state.bandCount];
+    if (bands.length !== state.bandCount) return null;
+    for (let i = 0; i < scheme.length; i += 1){
+      if (scheme[i].type !== "temp" && !bands[i]) return null;
+      if (scheme[i].type === "temp" && !bands[i]) return null;
+    }
+    const digits = [];
+    let multiplier = 1;
+    let tolerance = state.bandCount < 4 ? 20 : null;
+    let tempco = null;
+    scheme.forEach((role, index) => {
+      const key = bands[index];
+      if (!key) return;
+      if (role.type === "digit") digits.push(COLORS[key].digit);
+      if (role.type === "mult") multiplier = COLORS[key].mult;
+      if (role.type === "tol") tolerance = COLORS[key].tol;
+      if (role.type === "temp") tempco = COLORS[key].temp;
+    });
+    if (!digits.length) return null;
+    const digitText = digits.join("");
+    const value = Number((Number(digitText) * multiplier).toPrecision(12));
+    return {
+      bands:bands.slice(),
+      digits:digitText,
+      multiplier,
+      tolerance,
+      tempco,
+      value,
+      range:tolerance !== null ? {min:value * (1 - tolerance / 100), max:value * (1 + tolerance / 100)} : null,
+      series:inferSeries(value, tolerance)
+    };
+  }
+
+  function computeSuggestion(){
+    const numeric = Number.parseFloat(String(state.targetValue).replace(",", "."));
+    const unit = Number(state.targetUnit);
+    if (!Number.isFinite(numeric) || numeric <= 0 || !Number.isFinite(unit) || unit <= 0) return null;
+    const target = numeric * unit;
+    const tolerance = state.bandCount < 4 ? 20 : Number(state.targetTolerance);
+    const tempco = state.bandCount === 6 ? Number(state.targetTemp) : null;
+    const candidate = nearestCandidate(target, tolerance, tempco);
+    if (!candidate) return null;
+    const result = computeDecode(candidate.bands);
+    const delta = Math.abs(result.value - target);
+    const deltaPct = target === 0 ? 0 : (delta / target) * 100;
+    return {target, result, deltaPct, exact:delta < Math.max(target * 1e-10, 1e-10)};
+  }
+
+  function nearestCandidate(target, tolerance, tempco){
+    const digitCount = SCHEMES[state.bandCount].filter((role) => role.type === "digit").length;
+    const tolKeys = state.bandCount < 4 ? [null] : TOLS.filter((key) => COLORS[key].tol === tolerance);
+    const tempKeys = state.bandCount === 6 ? TEMPS.filter((key) => COLORS[key].temp === tempco) : [null];
+    let best = null;
+
+    const pushCandidate = (bands, value) => {
+      const delta = Math.abs(value - target);
+      if (!best || delta < best.delta) best = {bands, value, delta};
+    };
+
+    if (digitCount === 2){
+      FIRST_DIGITS.forEach((a) => DIGITS.forEach((b) => MULTS.forEach((m) => {
+        const value = (COLORS[a].digit * 10 + COLORS[b].digit) * COLORS[m].mult;
+        tolKeys.forEach((t) => tempKeys.forEach((temp) => {
+          const bands = [a,b,m];
+          if (t) bands.push(t);
+          if (temp) bands.push(temp);
+          pushCandidate(bands, value);
+        }));
+      })));
+    } else {
+      FIRST_DIGITS.forEach((a) => DIGITS.forEach((b) => DIGITS.forEach((c) => MULTS.forEach((m) => {
+        const value = (COLORS[a].digit * 100 + COLORS[b].digit * 10 + COLORS[c].digit) * COLORS[m].mult;
+        tolKeys.forEach((t) => tempKeys.forEach((temp) => {
+          const bands = [a,b,c,m];
+          if (t) bands.push(t);
+          if (temp) bands.push(temp);
+          pushCandidate(bands, value);
+        }));
+      }))));
+    }
+    return best;
+  }
+
+  function renderBandPills(bands){
+    app.bandPills.innerHTML = SCHEMES[state.bandCount].map((role, index) => {
+      const label = bands[index] ? COLORS[bands[index]].label : "Sin definir";
+      return `<span class="pill">${role.label}: <strong>${label}</strong></span>`;
+    }).join("");
+  }
+
+  function renderResistor(bands){
+    const scheme = SCHEMES[state.bandCount];
+    const start = 315;
+    const gap = state.bandCount === 6 ? 62 : state.bandCount === 5 ? 72 : state.bandCount === 4 ? 88 : 102;
+    const width = state.bandCount >= 5 ? 32 : 36;
+    const stripes = scheme.map((role, index) => {
+      const key = bands[index];
+      const color = key ? COLORS[key] : {fill:"#ece7dd",stroke:"#d8d2c8"};
+      const x = start + index * gap;
+      return `<g>
+        <rect x="${x}" y="88" width="${width}" height="144" rx="12" fill="${color.fill}" stroke="${color.stroke}" stroke-width="${key ? 4 : 3}" ${key ? "" : 'stroke-dasharray="10 8"'}></rect>
+        <text x="${x + width / 2}" y="264" text-anchor="middle" font-size="20" font-family="Bahnschrift, Aptos, sans-serif" fill="#56667b">${role.label.replace(" banda","")}</text>
+      </g>`;
+    }).join("");
+    app.resistorSvg.innerHTML = `<svg viewBox="0 0 900 320" width="900" height="320" role="img" aria-label="Vista previa de la resistencia">
+      <defs>
+        <linearGradient id="body-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#f6e7ca"></stop>
+          <stop offset="45%" stop-color="#dcc39c"></stop>
+          <stop offset="100%" stop-color="#b89263"></stop>
+        </linearGradient>
+      </defs>
+      <line x1="18" y1="160" x2="250" y2="160" stroke="#728297" stroke-width="16" stroke-linecap="round"></line>
+      <line x1="650" y1="160" x2="882" y2="160" stroke="#728297" stroke-width="16" stroke-linecap="round"></line>
+      <rect x="225" y="92" width="450" height="136" rx="68" fill="url(#body-grad)" stroke="#8a6940" stroke-width="8"></rect>
+      <rect x="245" y="106" width="410" height="36" rx="18" fill="rgba(255,255,255,.25)"></rect>
+      <rect x="252" y="188" width="396" height="22" rx="11" fill="rgba(0,0,0,.12)"></rect>
+      ${stripes}
+    </svg>`;
+  }
+
+  function buildReference(){
+    const colorRows = ORDER.map((key) => {
+      const color = COLORS[key];
+      return `<tr>
+        <td><div class="color-cell"><span class="dot" style="background:${color.fill};border-color:${color.stroke}"></span>${color.label}</div></td>
+        <td>${color.digit === null ? "—" : color.digit}</td>
+        <td>${formatMultiplier(color.mult)}</td>
+        <td>${color.tol === null ? "—" : "±" + formatPercent(color.tol) + "%"}</td>
+        <td>${color.temp === null ? "—" : color.temp + " ppm/°C"}</td>
+      </tr>`;
+    }).join("") + `<tr><td>Sin banda</td><td>—</td><td>—</td><td>±20%</td><td>—</td></tr>`;
+
+    const seriesRows = [
+      ["E6","±20%","6","3 bandas y usos básicos"],
+      ["E12","±10%","12","Uso general"],
+      ["E24","±5%","24","Muy habitual en 4 bandas"],
+      ["E48","±2%","48","Precisión media"],
+      ["E96","±1%","96","Precisión alta"],
+      ["E192","≤ ±0,5%","192","Precisión muy alta"]
+    ].map((row) => `<tr>${row.map((value) => `<td>${value}</td>`).join("")}</tr>`).join("");
+
+    app.referenceArea.innerHTML = `
+      <p class="label">Código de colores</p>
+      <div class="table-wrap"><table><thead><tr><th>Color</th><th>Dígito</th><th>Multiplicador</th><th>Tolerancia</th><th>Tempco</th></tr></thead><tbody>${colorRows}</tbody></table></div>
+      <p class="label" style="margin-top:18px">Series comerciales</p>
+      <div class="table-wrap"><table><thead><tr><th>Serie</th><th>Tolerancia típica</th><th>Valores por década</th><th>Uso</th></tr></thead><tbody>${seriesRows}</tbody></table></div>`;
+  }
+
+  function colorOptions(type, index){
+    if (type === "digit") return index === 0 ? FIRST_DIGITS : DIGITS;
+    if (type === "mult") return MULTS;
+    if (type === "tol") return TOLS;
+    if (type === "temp") return TEMPS;
+    return ORDER;
+  }
+
+  function inferSeries(value, tolerance){
+    const name = tolerance === null || tolerance >= 20 ? "E6" : tolerance >= 10 ? "E12" : tolerance >= 5 ? "E24" : tolerance >= 2 ? "E48" : tolerance >= 1 ? "E96" : "E192";
+    const set = buildSeries(name);
+    const exp = Math.floor(Math.log10(value));
+    let best = value;
+    let delta = Infinity;
+    [exp - 1, exp, exp + 1].forEach((power) => {
+      const decade = Math.pow(10, power);
+      set.forEach((mantissa) => {
+        const candidate = mantissa * decade;
+        const diff = Math.abs(candidate - value);
+        if (diff < delta){
+          delta = diff;
+          best = candidate;
+        }
+      });
+    });
+    return {name, closest:best};
+  }
+
+  function buildSeries(name){
+    if (name === "E6") return [1.0,1.5,2.2,3.3,4.7,6.8];
+    if (name === "E12") return [1.0,1.2,1.5,1.8,2.2,2.7,3.3,3.9,4.7,5.6,6.8,8.2];
+    if (name === "E24") return [1.0,1.1,1.2,1.3,1.5,1.6,1.8,2.0,2.2,2.4,2.7,3.0,3.3,3.6,3.9,4.3,4.7,5.1,5.6,6.2,6.8,7.5,8.2,9.1];
+    const total = name === "E48" ? 48 : name === "E96" ? 96 : 192;
+    const precision = name === "E48" ? 2 : 3;
+    const values = [];
+    for (let i = 0; i < total; i += 1){
+      const rounded = Number(Math.pow(10, i / total).toPrecision(precision));
+      if (!values.includes(rounded)) values.push(rounded);
+    }
+    return values;
+  }
+
+  function resetCurrent(){
+    if (state.mode === "decode"){
+      state.selections = new Array(state.bandCount).fill(null);
+      toast("Selección de bandas reiniciada.");
+    } else {
+      state.targetValue = "4.7";
+      state.targetUnit = "1000";
+      state.targetTolerance = state.bandCount === 4 ? "5" : "1";
+      state.targetTemp = "100";
+      toast("Parámetros de diseño reiniciados.");
+    }
+    render();
+  }
+
+  function applySuggestion(){
+    if (!state.suggestion) return;
+    state.mode = "decode";
+    state.selections = state.suggestion.result.bands.slice();
+    toast("Sugerencia aplicada al lector.");
+    render();
+  }
+
+  function copySummary(){
+    const text = app.summaryText || "OhmScan";
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(() => toast("Resumen copiado.")).catch(() => fallbackCopy(text));
+      return;
+    }
+    fallbackCopy(text);
+  }
+
+  function fallbackCopy(text){
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.style.position = "fixed";
+    area.style.left = "-1000px";
+    document.body.appendChild(area);
+    area.select();
+    try { document.execCommand("copy"); toast("Resumen copiado."); }
+    catch (error) { toast("No se pudo copiar automáticamente."); }
+    area.remove();
+  }
+
+  function toast(message){
+    clearTimeout(state.toastTimer);
+    app.toast.textContent = message;
+    app.toast.classList.remove("hidden");
+    state.toastTimer = setTimeout(() => app.toast.classList.add("hidden"), 2200);
+  }
+
+  function describeBands(bands, compact){
+    return SCHEMES[state.bandCount].map((role, index) => {
+      const color = bands[index] ? COLORS[bands[index]].label : "Sin definir";
+      return compact ? color : `${role.label}: ${color}`;
+    }).join(compact ? " · " : " | ");
+  }
+
+  function schemeText(count){
+    return count === 3 ? "2 dígitos + multiplicador" : count === 4 ? "2 dígitos + multiplicador + tolerancia" : count === 5 ? "3 dígitos + multiplicador + tolerancia" : "3 dígitos + multiplicador + tolerancia + tempco";
+  }
+
+  function formatOhms(value){
+    if (!Number.isFinite(value)) return "—";
+    if (value >= 1e9) return `${trim(value / 1e9)} GΩ`;
+    if (value >= 1e6) return `${trim(value / 1e6)} MΩ`;
+    if (value >= 1e3) return `${trim(value / 1e3)} kΩ`;
+    return `${trim(value, value < 1 ? 4 : 3)} Ω`;
+  }
+
+  function formatExact(value){
+    return `${new Intl.NumberFormat("es-ES", {maximumFractionDigits:6}).format(value)} Ω`;
+  }
+
+  function formatMultiplier(value){
+    if (value >= 1e9) return "×1G";
+    if (value >= 1e6) return `×${trim(value / 1e6)}M`;
+    if (value >= 1e3) return `×${trim(value / 1e3)}k`;
+    return `×${trim(value, value < 1 ? 4 : 3)}`;
+  }
+
+  function formatPercent(value){
+    return trim(value, 4).replace(".", ",");
+  }
+
+  function trim(value, digits = 3){
+    return new Intl.NumberFormat("es-ES", {maximumFractionDigits:digits, minimumFractionDigits:0}).format(value);
+  }
+
+  function shade(hex){
+    const raw = hex.replace("#","");
+    const value = raw.length === 3 ? raw.split("").map((char) => char + char).join("") : raw;
+    const num = parseInt(value, 16);
+    const r = Math.max(0, ((num >> 16) & 255) - 14);
+    const g = Math.max(0, ((num >> 8) & 255) - 14);
+    const b = Math.max(0, (num & 255) - 14);
+    return `rgb(${r},${g},${b})`;
+  }
+})();
+</script>
+</body>
+</html>
